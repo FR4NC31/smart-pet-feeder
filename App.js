@@ -2,10 +2,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 //pages
-import Login from './pages/Loginpage'
-import Start from './pages/GettingStarted'
-import Signup from './pages/Signuppage'
-import Forgot from './pages/Forgotpage'
+import Login from './Screens/LoginScreen'
+import Start from './Screens/GettingStartedScreen'
+import Signup from './Screens/SignupScreen'
+import Forgot from './Screens/ForgotpwScreen'
 
 const Stack = createNativeStackNavigator();
 
