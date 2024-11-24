@@ -25,7 +25,7 @@ export default function Loginpage({navigation}) {
       <Text style={[styles.title1, styles.title]}>Hello, Welcome to</Text>
       <Text style={[styles.title2, styles.title]}>Smart Pet Feeder</Text>
 
-      <View style={{marginTop: 20}}>
+      <View style={{marginTop: 30}}>
         <View style={styles.email}>
           <Ionicons name="mail-outline" size={40} color="black" style={styles.emailIcon} />
           <TextInput style={styles.input} keyboardType="email-address" placeholder="Email" placeholderTextColor="black"  />
@@ -33,12 +33,12 @@ export default function Loginpage({navigation}) {
         <Feather name="lock" size={40} color="black" style={styles.lockIcon} />
         <TextInput style={styles.input} placeholder="Password" secureTextEntry={showPassword} placeholderTextColor="black" />
         <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-          {showPassword ? <Feather name="eye" size={30} color="black" style={styles.eyeIcon} /> : <Feather name="eye-off" size={30} color="black" style={styles.eyeIcon} />}
+          {showPassword ? <Feather name="eye-off" size={30} color="black" style={styles.eyeIcon} /> : <Feather name="eye" size={30} color="black" style={styles.eyeIcon} />}
         </TouchableOpacity>
-        <TouchableOpacity style={styles.btn}>
+        <TouchableOpacity onPress={() => navigation.navigate('Dashboard')} style={styles.btn}>
           <Text style={styles.btntxt}>Login</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Forgot')}>
+        <TouchableOpacity onPress={() => navigation.navigate('SentEmail')}>
           <Text style={styles.forgot}>Forgot Password?</Text>
         </TouchableOpacity>
         <Text style={styles.account}>
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     img: {
         height: 258,
         width: 290,
-        marginHorizontal: 55,
+        marginHorizontal: 60,
         marginVertical: 100,
     },
     title: {
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     title2: {
         fontSize: 24,
         fontFamily: 'PoppinsExtraBold',
-        marginTop: -15
+        marginTop: -10
     },
     input: {
         height: 68,
@@ -79,12 +79,13 @@ const styles = StyleSheet.create({
         borderColor: 'black',
         borderWidth: 1,
         borderRadius: 10,
-        marginHorizontal: 45,
+        marginHorizontal: 55,
         marginBottom: 30,
         paddingLeft: 65,
         paddingRight: 65,
         fontFamily: 'PoppinsRegular',
-        fontSize: 20,
+        fontSize: 22,
+        opacity: 0.5,
     },
     btn: {
         alignItems: 'center',
@@ -98,9 +99,9 @@ const styles = StyleSheet.create({
     },
 
     btntxt: {
-        fontSize: 20,
+        fontSize: 23,
         color: 'white',
-        fontFamily: 'PoppinsRegular',
+        fontFamily: 'PoppinsBold',
     },
 
     email: {
@@ -111,21 +112,24 @@ const styles = StyleSheet.create({
     emailIcon: {
       marginRight: 10,
       position: 'absolute',
-      left: 55,
+      left: 65,
       top: 15,
+      opacity: 0.5,
     },
 
     lockIcon: {
         marginRight: 10,
         position: 'absolute',
-        left: 55,
+        left: 65,
         top: 110,
+        opacity: 0.5,
       },
     eyeIcon: {
         marginRight: 10,
         position: 'absolute',
-        left: 310,
+        left: 330,
         top: -77,
+        opacity: 0.5,
       },
       forgot: {
         textAlign: 'center',
@@ -137,7 +141,7 @@ const styles = StyleSheet.create({
 
       account: {
         textAlign: 'center',
-        marginTop: 80,
+        marginTop: 140,
         fontSize: 16,
         fontFamily: 'PoppinsBold',
         left: -40
@@ -151,7 +155,7 @@ const styles = StyleSheet.create({
         color: '#6C87F6',
         textDecorationLine: 'underline',
         position: 'absolute',
-        left: 90,
-        top: -38
+        left: 260,
+        top: -35
       },
 })

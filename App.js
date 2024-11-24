@@ -6,6 +6,10 @@ import Login from './Screens/LoginScreen'
 import Start from './Screens/GettingStartedScreen'
 import Signup from './Screens/SignupScreen'
 import Forgot from './Screens/ForgotpwScreen'
+import SentEmail from './Screens/sentEmail'
+import Dashboard from './Screens/Dashboard'
+import TimeSetter from './Screens/timeSetter'
+import ProfileUser from './Screens/ProfileUser'
 
 const Stack = createNativeStackNavigator();
 
@@ -17,6 +21,10 @@ export default function App() {
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
         <Stack.Screen name="Signup" component={Signup} options={{ headerShown: false }} />
         <Stack.Screen name="Forgot" component={Forgot} options={{ headerShown: false }} />
+        <Stack.Screen name="SentEmail" component={SentEmail} options={{ headerShown: false }} />
+        <Stack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />
+        <Stack.Screen name="TimeSetter" component={TimeSetter} options={{ headerShown: false }} />
+        <Stack.Screen name="ProfileUser" component={ProfileUser} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

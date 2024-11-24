@@ -9,10 +9,6 @@ export default function Slides() {
     MontserratBold: require('../assets/Fonts/Montserrat-Bold.ttf'),
   });
 
-  if (!fontsLoaded) {
-    return null;
-  }
-
   const flatlistRef = useRef(null);
   const screenWidth = Dimensions.get('window').width;
 
