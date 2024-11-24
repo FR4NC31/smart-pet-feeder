@@ -1,8 +1,13 @@
 import { StyleSheet, Text, View, TouchableOpacity} from 'react-native'
 import Slides from '../components/SlidesComponent'
+import { useFonts } from 'expo-font';
 import React from 'react'
 
 export default function GettingStarted({navigation}) {
+
+    const [fontsLoaded] = useFonts({
+        'PoppinsBold': require('../assets/Fonts/Poppins-Bold.ttf')
+      });
 
   return (
     <View>
@@ -26,7 +31,8 @@ const styles = StyleSheet.create({
         marginHorizontal: 50,
     },
     btntxt: {
-        fontSize: 20,
+        fontSize: 23,
         color: 'white',
+        fontFamily: 'PoppinsBold',
     }
 })

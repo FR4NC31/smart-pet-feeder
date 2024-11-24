@@ -3,7 +3,7 @@ import { useFonts } from 'expo-font';
 import { Feather } from '@expo/vector-icons';
 import React from 'react'
 
-export default function Signuppage({navigation}) {
+export default function SentEmailpage({navigation}) {
 
     const [fontsLoaded] = useFonts({
         'PoppinsRegular': require('../assets/Fonts/Poppins-Regular.ttf'),
@@ -17,22 +17,15 @@ export default function Signuppage({navigation}) {
 
   return (
     <View>
-      <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.backIcon}>
+        <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.backIcon}>
             <Feather name="chevron-left" size={60} color="black" />
-      </TouchableOpacity>
-      <Text style={styles.title}>Create an account</Text>
+        </TouchableOpacity>
+      <Text style={styles.title}>Send Email Address</Text>
 
-      <View style={{marginTop: 30}}>
-        <View style={styles.email}>
-          <TextInput style={styles.input} placeholder="Username" placeholderTextColor="black"  />
-        </View>
-        <View style={styles.email}>
-          <TextInput style={styles.input} keyboardType="email-address" placeholder="Email" placeholderTextColor="black"  />
-        </View>
-        <TextInput style={styles.input} placeholder="Password" placeholderTextColor="black" secureTextEntry={true} />
-        <TextInput style={styles.input} placeholder="Re-enter Password" placeholderTextColor="black" secureTextEntry={true} />
-        <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.btn}>
-          <Text style={styles.btntxt}>Sign Up</Text>
+      <View style={{marginTop: 50}}>
+        <TextInput style={styles.input} placeholder="Email" placeholderTextColor="black"  />
+        <TouchableOpacity onPress={() => navigation.navigate('Forgot')} style={styles.btn}>
+          <Text style={styles.btntxt}>Submit</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -41,15 +34,15 @@ export default function Signuppage({navigation}) {
 
 const styles = StyleSheet.create({
     backIcon: {
-      marginTop: 50,
-      marginLeft: 10,
+        marginTop: 50,
+        marginLeft: 10,
     },
 
     title: {
         fontSize: 32,
         textAlign: 'center',
         color: 'black',
-        marginTop: 70,
+        marginTop: 200,
         paddingTop: -30,
         fontFamily: 'PoppinsBold',
         },
@@ -84,10 +77,5 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: 'white',
         fontFamily: 'PoppinsBold',
-        },
-
-    email: {
-        flexDirection: 'row',
-        alignItems: 'center',
         },
 })
