@@ -1,11 +1,43 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image, Alert } from 'react-native'
 import { useFonts } from 'expo-font';
 import { FontAwesome, Ionicons, MaterialIcons} from '@expo/vector-icons';
-import React from 'react'
 import { signOut } from 'firebase/auth';
-import { auth } from "../firebase";
+import { auth, rtdb } from "../firebase"; // Import the Firebase auth and Realtime DB
+import { ref, get } from 'firebase/database'; // Import the Firebase Realtime DB functions
+import React, { useEffect, useState } from 'react';
+
 
 export default function Dashboardpage({navigation}) {
+
+    const [username, setUsername] = useState("");
+
+    useEffect(() => {
+        // Fetch the username when the component mounts
+        const fetchUsername = async () => {
+          const user = auth.currentUser;
+          if (user) {
+            // Get the reference to the user in Realtime Database
+            const usernameRef = ref(rtdb, 'users/' + user.uid + '/username');
+
+            try {
+              // Get the username from Firebase Realtime Database
+              const snapshot = await get(usernameRef);
+              if (snapshot.exists()) {
+                setUsername(snapshot.val());  // Set the username state
+              } else {
+                Alert.alert("Error", "No username found in database.");
+              }
+            } catch (error) {
+              console.error("Error fetching username: ", error);
+              Alert.alert("Error", "Failed to fetch username.");
+            }
+          } else {
+            Alert.alert("Error", "No user logged in.");
+          }
+        };
+
+        fetchUsername(); // Call the function to fetch username
+      }, []);
 
     const handleLogout = () => {
         signOut(auth)
@@ -34,6 +66,8 @@ export default function Dashboardpage({navigation}) {
         <TouchableOpacity onPress={() => navigation.navigate('ProfileUser')}>
             <Image source={require('../assets/profile.png')} style={styles.profile} />
             </TouchableOpacity>
+            <Text style={styles.username}>Welcome Back,</Text>
+            <Text style={styles.usernamedb}>{username}</Text>
         <FontAwesome name="bell-o" size={40} color="black" style={styles.notifIcon}/>
 
         <Image source={require('../assets/dash.png')} style={styles.dashimg} />
@@ -87,7 +121,7 @@ const styles = StyleSheet.create({
 
     notifIcon: {
         marginTop: -43,
-        marginLeft: 80,
+        marginLeft: 340,
     },
 
     dashimg: {
@@ -141,5 +175,22 @@ const styles = StyleSheet.create({
     icon: {
         alignItems: 'center',
         justifyContent: 'center',
+    },
+
+    username: {
+        fontSize: 15,
+        color: 'black',
+        fontFamily: 'MontserratBold',
+        position: 'absolute',
+        top: 60,
+        left: 70,
+    },
+    usernamedb: {
+        fontSize: 15,
+        color: 'black',
+        fontFamily: 'MontserratBold',
+        position: 'absolute',
+        top: 80,
+        left: 70,
     },
 })
