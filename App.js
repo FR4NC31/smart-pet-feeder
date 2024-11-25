@@ -5,7 +5,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './Screens/LoginScreen'
 import Start from './Screens/GettingStartedScreen'
 import Signup from './Screens/SignupScreen'
-import Forgot from './Screens/ForgotpwScreen'
 import SentEmail from './Screens/sentEmail'
 import Dashboard from './Screens/Dashboard'
 import TimeSetter from './Screens/timeSetter'
@@ -20,7 +19,6 @@ export default function App() {
         <Stack.Screen name="Start" component={Start} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
         <Stack.Screen name="Signup" component={Signup} options={{ headerShown: false }} />
-        <Stack.Screen name="Forgot" component={Forgot} options={{ headerShown: false }} />
         <Stack.Screen name="SentEmail" component={SentEmail} options={{ headerShown: false }} />
         <Stack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />
         <Stack.Screen name="TimeSetter" component={TimeSetter} options={{ headerShown: false }} />

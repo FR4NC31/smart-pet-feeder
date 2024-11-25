@@ -1,9 +1,25 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, Image, Alert } from 'react-native'
 import { useFonts } from 'expo-font';
-import { FontAwesome, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { FontAwesome, Ionicons, MaterialIcons} from '@expo/vector-icons';
 import React from 'react'
+import { signOut } from 'firebase/auth';
+import { auth } from "../firebase";
 
 export default function Dashboardpage({navigation}) {
+
+    const handleLogout = () => {
+        signOut(auth)
+          .then(() => {
+            // Successfully logged out
+            Alert.alert("Success", "You have been logged out!");
+            navigation.navigate('Login'); // Navigate back to the login screen
+          })
+          .catch((error) => {
+            // Handle any errors that occur during logout
+            console.error("Error logging out: ", error.message);
+            Alert.alert("Error", "There was an issue logging out.");
+          });
+      };
 
     const [fontsLoaded] = useFonts({
         'MontserratBold': require('../assets/Fonts/Montserrat-Bold.ttf')
@@ -15,7 +31,9 @@ export default function Dashboardpage({navigation}) {
 
   return (
     <View style={{backgroundColor: '#fff'}}>
-        <Image source={require('../assets/profile.png')} style={styles.profile} />
+        <TouchableOpacity onPress={() => navigation.navigate('ProfileUser')}>
+            <Image source={require('../assets/profile.png')} style={styles.profile} />
+            </TouchableOpacity>
         <FontAwesome name="bell-o" size={40} color="black" style={styles.notifIcon}/>
 
         <Image source={require('../assets/dash.png')} style={styles.dashimg} />
@@ -49,11 +67,11 @@ export default function Dashboardpage({navigation}) {
             <TouchableOpacity onPress={() => navigation.navigate('Pet1')} style={styles.icon}>
                 <Ionicons name="information-circle-outline" size={50} color="black" style={{marginTop: 1}}/>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('ProfileUser')} style={styles.icon}>
-                <FontAwesome name="user-o" size={40} color="black"/>
+            <TouchableOpacity onPress={handleLogout} style={styles.icon}>
+                <MaterialIcons name="logout" size={40} color="black"/>
             </TouchableOpacity>
         </View>
-      
+
     </View>
   )
 }
