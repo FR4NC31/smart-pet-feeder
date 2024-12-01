@@ -175,6 +175,7 @@ const styles = StyleSheet.create({
     icon: {
         alignItems: 'center',
         justifyContent: 'center',
+        marginBottom: 100,
     },
 
     username: {

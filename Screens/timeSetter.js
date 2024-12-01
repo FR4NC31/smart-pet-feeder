@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,6 +11,15 @@ import {
 } from 'react-native';
 import { useFonts } from 'expo-font';
 import { Feather, Ionicons } from '@expo/vector-icons';
+import {
+  getDatabase,
+  ref,
+  push,
+  onValue,
+  update,
+  remove,
+} from 'firebase/database';
+import { getAuth } from 'firebase/auth'; // Firebase Authentication
 
 export default function TimeSetter({ navigation }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -22,45 +31,90 @@ export default function TimeSetter({ navigation }) {
   const [editingIndex, setEditingIndex] = useState(null);
   const [selectedPeriod, setSelectedPeriod] = useState('AM');
 
-  const handleSave = () => {
-    // Perform validation first
+  // Firebase database and auth reference
+  const db = getDatabase();
+  const auth = getAuth();
+  const userId = auth.currentUser?.uid; // Get the current user's ID
+
+  // Fetch alarms from the database on component mount
+  useEffect(() => {
+    if (!userId) return; // Ensure user is logged in
+
+    const alarmsRef = ref(db, `alarms/${userId}`);
+    const unsubscribe = onValue(alarmsRef, (snapshot) => {
+      const data = snapshot.val();
+      const alarmsList = data
+        ? Object.entries(data).map(([id, alarm]) => ({ id, ...alarm }))
+        : [];
+      setTimes(alarmsList);
+    });
+
+    return () => unsubscribe(); // Clean up the listener
+  }, [userId]);
+
+  const handleSave = async () => {
     if (!hour || !minute || !selectedPeriod) {
       alert('Please ensure all fields are filled correctly.');
       return;
     }
 
-    // Only proceed if all fields are valid
     const formattedTime = `${hour}:${minute} ${selectedPeriod}`;
-    setTimes((prev) => [...prev, { time: formattedTime, isEnabled: true }]);
-    closeModal();
+    const newAlarm = { time: formattedTime, isEnabled: true };
+
+    try {
+      const alarmsRef = ref(db, `alarms/${userId}`);
+      await push(alarmsRef, newAlarm); // Add new alarm to the database
+      closeModal();
+    } catch (error) {
+      console.error('Error saving alarm:', error.message);
+      alert('Failed to save the alarm. Please try again.');
+    }
   };
 
-  const handleEditSave = () => {
+  const handleEditSave = async () => {
     if (!hour || !minute || !selectedPeriod) {
       alert('Please ensure all fields are filled correctly.');
       return;
     }
 
     const formattedTime = `${hour}:${minute} ${selectedPeriod}`;
-    setTimes((prev) =>
-      prev.map((alarm, index) =>
-        index === editingIndex ? { ...alarm, time: formattedTime } : alarm
-      )
-    );
-    closeEditModal();
+    const updatedAlarm = {
+      time: formattedTime,
+      isEnabled: times[editingIndex].isEnabled,
+    };
+
+    try {
+      const alarmRef = ref(db, `alarms/${userId}/${times[editingIndex].id}`);
+      await update(alarmRef, updatedAlarm); // Update alarm in the database
+      closeEditModal();
+    } catch (error) {
+      console.error('Error updating alarm:', error.message);
+      alert('Failed to update the alarm. Please try again.');
+    }
   };
 
-  const deleteAlarm = (index) => {
-    setTimes((prev) => prev.filter((_, idx) => idx !== index));
-    setExpandedIndex(null); // Close expanded view if deleted
+  const deleteAlarm = async (index) => {
+    try {
+      const alarmRef = ref(db, `alarms/${userId}/${times[index].id}`);
+      await remove(alarmRef); // Remove alarm from the database
+      setExpandedIndex(null); // Close expanded view if deleted
+    } catch (error) {
+      console.error('Error deleting alarm:', error.message);
+      alert('Failed to delete the alarm. Please try again.');
+    }
   };
 
-  const toggleAlarm = (index) => {
-    setTimes((prev) =>
-      prev.map((alarm, idx) =>
-        idx === index ? { ...alarm, isEnabled: !alarm.isEnabled } : alarm
-      )
-    );
+  const toggleAlarm = async (index) => {
+    const alarm = times[index];
+    const updatedAlarm = { ...alarm, isEnabled: !alarm.isEnabled };
+
+    try {
+      const alarmRef = ref(db, `alarms/${userId}/${alarm.id}`);
+      await update(alarmRef, updatedAlarm); // Update isEnabled state in the database
+    } catch (error) {
+      console.error('Error toggling alarm:', error.message);
+      alert('Failed to toggle the alarm. Please try again.');
+    }
   };
 
   const toggleExpand = (index) => {
@@ -89,7 +143,7 @@ export default function TimeSetter({ navigation }) {
       setHour(text);
     }
   };
-
+  
   const handleMinuteChange = (text) => {
     if (/^[0-5]?[0-9]$/.test(text)) {
       setMinute(text);
@@ -113,7 +167,6 @@ export default function TimeSetter({ navigation }) {
         <Feather name="chevron-left" size={60} color="black" />
       </TouchableOpacity>
 
-      {/* Alarms Display */}
       <ScrollView contentContainerStyle={{ paddingHorizontal: 20 }}>
         {times.length === 0 ? (
           <Text style={styles.noAlarmText}>
@@ -121,40 +174,44 @@ export default function TimeSetter({ navigation }) {
           </Text>
         ) : (
           times.map((alarm, index) => (
-            <View key={index}  style={[
-                styles.time, {flexDirection: 'column'},
-                expandedIndex === index && { height: 161 }, // Conditional height
-              ]}>
+            <View
+              key={index}
+              style={[
+                styles.time,
+                { flexDirection: 'column' },
+                expandedIndex === index && { height: 161 },
+              ]}
+            >
               <TouchableOpacity onPress={() => toggleExpand(index)}>
                 <View style={styles.timeRow}>
-                    <Text style={[styles.timetxt]}>{alarm.time}</Text> {/* This is fine */}
-                    <Switch
+                  <Text style={[styles.timetxt]}>{alarm.time}</Text>
+                  <Switch
                     style={{ marginLeft: 280 }}
                     value={alarm.isEnabled}
                     onValueChange={() => toggleAlarm(index)}
-                    />
+                  />
                 </View>
               </TouchableOpacity>
               {expandedIndex === index && (
                 <View style={styles.expandedButtons}>
-                   <TouchableOpacity
-          onPress={() => {
-            setIsEditModalVisible(true);
-            setHour(alarm.time.split(':')[0]);
-            setMinute(alarm.time.split(':')[1].split(' ')[0]);
-            setSelectedPeriod(alarm.time.split(' ')[1]);
-            setEditingIndex(index);
-          }}
-          style={styles.editButton}
-        >
-          <Text style={styles.editButtonText}>Edit</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => deleteAlarm(index)}
-          style={styles.deleteButton}
-        >
-          <Text style={styles.deleteButtonText}>Delete</Text>
-        </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setIsEditModalVisible(true);
+                      setHour(alarm.time.split(':')[0]);
+                      setMinute(alarm.time.split(':')[1].split(' ')[0]);
+                      setSelectedPeriod(alarm.time.split(' ')[1]);
+                      setEditingIndex(index);
+                    }}
+                    style={styles.editButton}
+                  >
+                    <Text style={styles.editButtonText}>Edit</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => deleteAlarm(index)}
+                    style={styles.deleteButton}
+                  >
+                    <Text style={styles.deleteButtonText}>Delete</Text>
+                  </TouchableOpacity>
                 </View>
               )}
             </View>
@@ -339,12 +396,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#D9D9D9',
     padding: 20,
     borderRadius: 10,
+
   },
   timetxt: {
     fontSize: 33,
     fontFamily: 'MontserratBold',
     position: 'absolute',
-    width: 300,
+    width: 350,
     backgroundColor: '#D9D9D9',
   },
   centeredView: {
@@ -355,7 +413,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     backgroundColor: '#FFF',
-    width: 350,
+    width: 300,
     height: 300,
     borderRadius: 15,
     padding: 20,
@@ -532,4 +590,4 @@ const styles = StyleSheet.create({
   switch: {
     marginLeft: 290,
   },
-})
+}) 
