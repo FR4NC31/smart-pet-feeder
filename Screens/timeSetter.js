@@ -20,6 +20,7 @@ import {
   remove,
 } from 'firebase/database';
 import { getAuth } from 'firebase/auth'; // Firebase Authentication
+<<<<<<< HEAD
 import * as Notifications from 'expo-notifications';
 import * as TaskManager from 'expo-task-manager';
 import * as BackgroundFetch from 'expo-background-fetch';
@@ -37,6 +38,8 @@ TaskManager.defineTask('ALARM_TRIGGER_TASK', async () => {
     }
   });
 
+=======
+>>>>>>> 3a14dd75709acdb1957c74a262929e3284514e5d
 
 export default function TimeSetter({ navigation }) {
   const { checkAndTriggerAlarms } = useAlarmTrigger();
@@ -54,6 +57,7 @@ export default function TimeSetter({ navigation }) {
   const auth = getAuth();
   const userId = auth.currentUser?.uid; // Get the current user's ID
 
+<<<<<<< HEAD
   const fetchAlarmsFromFirebase = async () => {
     const db = getDatabase();
     const userId = "user123"; // Replace with actual user ID
@@ -125,6 +129,12 @@ export default function TimeSetter({ navigation }) {
   useEffect(() => {
     if (!userId) return; // Ensure user is logged in
 
+=======
+  // Fetch alarms from the database on component mount
+  useEffect(() => {
+    if (!userId) return; // Ensure user is logged in
+
+>>>>>>> 3a14dd75709acdb1957c74a262929e3284514e5d
     const alarmsRef = ref(db, `alarms/${userId}`);
     const unsubscribe = onValue(alarmsRef, (snapshot) => {
       const data = snapshot.val();
@@ -149,7 +159,10 @@ export default function TimeSetter({ navigation }) {
     try {
       const alarmsRef = ref(db, `alarms/${userId}`);
       await push(alarmsRef, newAlarm); // Add new alarm to the database
+<<<<<<< HEAD
       await scheduleNotification(formattedTime); // Schedule push notification
+=======
+>>>>>>> 3a14dd75709acdb1957c74a262929e3284514e5d
       closeModal();
     } catch (error) {
       console.error('Error saving alarm:', error.message);
@@ -157,7 +170,10 @@ export default function TimeSetter({ navigation }) {
     }
   };
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3a14dd75709acdb1957c74a262929e3284514e5d
   const handleEditSave = async () => {
     if (!hour || !minute || !selectedPeriod) {
       alert('Please ensure all fields are filled correctly.');
@@ -173,7 +189,10 @@ export default function TimeSetter({ navigation }) {
     try {
       const alarmRef = ref(db, `alarms/${userId}/${times[editingIndex].id}`);
       await update(alarmRef, updatedAlarm); // Update alarm in the database
+<<<<<<< HEAD
       await scheduleNotification(formattedTime); // Reschedule push notification
+=======
+>>>>>>> 3a14dd75709acdb1957c74a262929e3284514e5d
       closeEditModal();
     } catch (error) {
       console.error('Error updating alarm:', error.message);
@@ -231,7 +250,7 @@ export default function TimeSetter({ navigation }) {
       setHour(text);
     }
   };
-
+  
   const handleMinuteChange = (text) => {
     if (/^[0-5]?[0-9]$/.test(text)) {
       setMinute(text);
@@ -497,7 +516,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     backgroundColor: '#FFF',
-    width: 350,
+    width: 300,
     height: 300,
     borderRadius: 15,
     padding: 20,
@@ -674,4 +693,4 @@ const styles = StyleSheet.create({
   switch: {
     marginLeft: 290,
   },
-})
+}) 

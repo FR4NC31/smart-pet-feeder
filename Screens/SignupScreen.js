@@ -42,6 +42,7 @@ export default function Signuppage({ navigation }) {
             await set(userRef, {
                 username: username,
                 email: email,
+                createdAt: new Date().toISOString()
             });
 
             Alert.alert("Success", `Account created successfully for ${username}`);
