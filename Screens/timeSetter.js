@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,8 +11,35 @@ import {
 } from 'react-native';
 import { useFonts } from 'expo-font';
 import { Feather, Ionicons } from '@expo/vector-icons';
+import {
+  getDatabase,
+  ref,
+  push,
+  onValue,
+  update,
+  remove,
+} from 'firebase/database';
+import { getAuth } from 'firebase/auth'; // Firebase Authentication
+import * as Notifications from 'expo-notifications';
+import * as TaskManager from 'expo-task-manager';
+import * as BackgroundFetch from 'expo-background-fetch';
+import useAlarmTrigger from '../useAlarmTrigger';
+
+
+TaskManager.defineTask('ALARM_TRIGGER_TASK', async () => {
+    try {
+      const { checkAndTriggerAlarms } = useAlarmTrigger();
+      await checkAndTriggerAlarms(); // Trigger alarm check
+      return BackgroundFetch.Result.NewData; // Fetch new data
+    } catch (error) {
+      console.error('Error in alarm trigger task:', error);
+      return BackgroundFetch.Result.Failed;
+    }
+  });
+
 
 export default function TimeSetter({ navigation }) {
+  const { checkAndTriggerAlarms } = useAlarmTrigger();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [times, setTimes] = useState([]);
@@ -22,45 +49,160 @@ export default function TimeSetter({ navigation }) {
   const [editingIndex, setEditingIndex] = useState(null);
   const [selectedPeriod, setSelectedPeriod] = useState('AM');
 
-  const handleSave = () => {
-    // Perform validation first
+  // Firebase database and auth reference
+  const db = getDatabase();
+  const auth = getAuth();
+  const userId = auth.currentUser?.uid; // Get the current user's ID
+
+  const fetchAlarmsFromFirebase = async () => {
+    const db = getDatabase();
+    const userId = "user123"; // Replace with actual user ID
+
+    onValue(ref(db, `alarms/${userId}`), (snapshot) => {
+      const alarms = snapshot.val();
+      if (alarms) {
+        Object.keys(alarms).forEach((alarmId) => {
+          const { time, active } = alarms[alarmId];
+          if (active) {
+            scheduleAlarmNotification(time);
+          }
+        });
+      }
+    });
+  };
+
+  useEffect(() => {
+    // Start background task
+    const registerBackgroundFetch = async () => {
+      try {
+        await BackgroundFetch.registerTaskAsync('ALARM_TRIGGER_TASK', {
+          minimumInterval: 60 * 15, // Check alarms every 15 minutes
+          stopOnTerminate: false, // Keep running when the app is terminated
+          startOnBoot: true, // Start the task after a device reboot
+        });
+      } catch (error) {
+        console.error('Error registering background task:', error);
+      }
+    };
+
+    registerBackgroundFetch();
+  }, []);
+
+  const scheduleNotification = async () => {
+    try {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Alarm Triggered",
+          body: "Your alarm is ringing!",
+          sound: true, // Enable sound
+        },
+        trigger: {
+          seconds: 10, // Schedule it 10 seconds from now
+        },
+      });
+      console.log("Notification scheduled successfully!");
+    } catch (error) {
+      console.error("Error scheduling notification:", error);
+    }
+  };
+
+  // Call this function where needed
+  scheduleNotification();
+
+  const requestNotificationPermissions = async () => {
+    const { status } = await Notifications.requestPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Notification permissions not granted!');
+    }
+  };
+
+  useEffect(() => {
+    requestNotificationPermissions();
+    fetchAlarmsFromFirebase(); // Start fetching alarms
+  }, []);
+
+  // Fetch alarms from the database on component mount
+  useEffect(() => {
+    if (!userId) return; // Ensure user is logged in
+
+    const alarmsRef = ref(db, `alarms/${userId}`);
+    const unsubscribe = onValue(alarmsRef, (snapshot) => {
+      const data = snapshot.val();
+      const alarmsList = data
+        ? Object.entries(data).map(([id, alarm]) => ({ id, ...alarm }))
+        : [];
+      setTimes(alarmsList);
+    });
+
+    return () => unsubscribe(); // Clean up the listener
+  }, [userId]);
+
+  const handleSave = async () => {
     if (!hour || !minute || !selectedPeriod) {
       alert('Please ensure all fields are filled correctly.');
       return;
     }
 
-    // Only proceed if all fields are valid
     const formattedTime = `${hour}:${minute} ${selectedPeriod}`;
-    setTimes((prev) => [...prev, { time: formattedTime, isEnabled: true }]);
-    closeModal();
+    const newAlarm = { time: formattedTime, isEnabled: true };
+
+    try {
+      const alarmsRef = ref(db, `alarms/${userId}`);
+      await push(alarmsRef, newAlarm); // Add new alarm to the database
+      await scheduleNotification(formattedTime); // Schedule push notification
+      closeModal();
+    } catch (error) {
+      console.error('Error saving alarm:', error.message);
+      alert('Failed to save the alarm. Please try again.');
+    }
   };
 
-  const handleEditSave = () => {
+
+  const handleEditSave = async () => {
     if (!hour || !minute || !selectedPeriod) {
       alert('Please ensure all fields are filled correctly.');
       return;
     }
 
     const formattedTime = `${hour}:${minute} ${selectedPeriod}`;
-    setTimes((prev) =>
-      prev.map((alarm, index) =>
-        index === editingIndex ? { ...alarm, time: formattedTime } : alarm
-      )
-    );
-    closeEditModal();
+    const updatedAlarm = {
+      time: formattedTime,
+      isEnabled: times[editingIndex].isEnabled,
+    };
+
+    try {
+      const alarmRef = ref(db, `alarms/${userId}/${times[editingIndex].id}`);
+      await update(alarmRef, updatedAlarm); // Update alarm in the database
+      await scheduleNotification(formattedTime); // Reschedule push notification
+      closeEditModal();
+    } catch (error) {
+      console.error('Error updating alarm:', error.message);
+      alert('Failed to update the alarm. Please try again.');
+    }
   };
 
-  const deleteAlarm = (index) => {
-    setTimes((prev) => prev.filter((_, idx) => idx !== index));
-    setExpandedIndex(null); // Close expanded view if deleted
+  const deleteAlarm = async (index) => {
+    try {
+      const alarmRef = ref(db, `alarms/${userId}/${times[index].id}`);
+      await remove(alarmRef); // Remove alarm from the database
+      setExpandedIndex(null); // Close expanded view if deleted
+    } catch (error) {
+      console.error('Error deleting alarm:', error.message);
+      alert('Failed to delete the alarm. Please try again.');
+    }
   };
 
-  const toggleAlarm = (index) => {
-    setTimes((prev) =>
-      prev.map((alarm, idx) =>
-        idx === index ? { ...alarm, isEnabled: !alarm.isEnabled } : alarm
-      )
-    );
+  const toggleAlarm = async (index) => {
+    const alarm = times[index];
+    const updatedAlarm = { ...alarm, isEnabled: !alarm.isEnabled };
+
+    try {
+      const alarmRef = ref(db, `alarms/${userId}/${alarm.id}`);
+      await update(alarmRef, updatedAlarm); // Update isEnabled state in the database
+    } catch (error) {
+      console.error('Error toggling alarm:', error.message);
+      alert('Failed to toggle the alarm. Please try again.');
+    }
   };
 
   const toggleExpand = (index) => {
@@ -100,10 +242,6 @@ export default function TimeSetter({ navigation }) {
     MontserratBold: require('../assets/Fonts/Montserrat-Bold.ttf'),
   });
 
-  if (!fontsLoaded) {
-    return null;
-  }
-
   return (
     <View style={{ backgroundColor: '#fff', flex: 1 }}>
       <TouchableOpacity
@@ -113,7 +251,6 @@ export default function TimeSetter({ navigation }) {
         <Feather name="chevron-left" size={60} color="black" />
       </TouchableOpacity>
 
-      {/* Alarms Display */}
       <ScrollView contentContainerStyle={{ paddingHorizontal: 20 }}>
         {times.length === 0 ? (
           <Text style={styles.noAlarmText}>
@@ -121,40 +258,44 @@ export default function TimeSetter({ navigation }) {
           </Text>
         ) : (
           times.map((alarm, index) => (
-            <View key={index}  style={[
-                styles.time, {flexDirection: 'column'},
-                expandedIndex === index && { height: 161 }, // Conditional height
-              ]}>
+            <View
+              key={index}
+              style={[
+                styles.time,
+                { flexDirection: 'column' },
+                expandedIndex === index && { height: 161 },
+              ]}
+            >
               <TouchableOpacity onPress={() => toggleExpand(index)}>
                 <View style={styles.timeRow}>
-                    <Text style={[styles.timetxt]}>{alarm.time}</Text> {/* This is fine */}
-                    <Switch
+                  <Text style={[styles.timetxt]}>{alarm.time}</Text>
+                  <Switch
                     style={{ marginLeft: 280 }}
                     value={alarm.isEnabled}
                     onValueChange={() => toggleAlarm(index)}
-                    />
+                  />
                 </View>
               </TouchableOpacity>
               {expandedIndex === index && (
                 <View style={styles.expandedButtons}>
-                   <TouchableOpacity
-          onPress={() => {
-            setIsEditModalVisible(true);
-            setHour(alarm.time.split(':')[0]);
-            setMinute(alarm.time.split(':')[1].split(' ')[0]);
-            setSelectedPeriod(alarm.time.split(' ')[1]);
-            setEditingIndex(index);
-          }}
-          style={styles.editButton}
-        >
-          <Text style={styles.editButtonText}>Edit</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => deleteAlarm(index)}
-          style={styles.deleteButton}
-        >
-          <Text style={styles.deleteButtonText}>Delete</Text>
-        </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setIsEditModalVisible(true);
+                      setHour(alarm.time.split(':')[0]);
+                      setMinute(alarm.time.split(':')[1].split(' ')[0]);
+                      setSelectedPeriod(alarm.time.split(' ')[1]);
+                      setEditingIndex(index);
+                    }}
+                    style={styles.editButton}
+                  >
+                    <Text style={styles.editButtonText}>Edit</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => deleteAlarm(index)}
+                    style={styles.deleteButton}
+                  >
+                    <Text style={styles.deleteButtonText}>Delete</Text>
+                  </TouchableOpacity>
                 </View>
               )}
             </View>
@@ -327,7 +468,7 @@ const styles = StyleSheet.create({
   },
   noAlarmText: {
     textAlign: 'center',
-    marginTop: 50,
+    marginTop: 350,
     fontSize: 18,
     color: '#555',
   },
@@ -339,12 +480,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#D9D9D9',
     padding: 20,
     borderRadius: 10,
+
   },
   timetxt: {
     fontSize: 33,
     fontFamily: 'MontserratBold',
     position: 'absolute',
-    width: 300,
+    width: 350,
     backgroundColor: '#D9D9D9',
   },
   centeredView: {

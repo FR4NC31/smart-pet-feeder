@@ -1,5 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { registerForPushNotificationsAsync } from './firebase';
 
 //pages
 import Login from './Screens/LoginScreen'
@@ -9,6 +10,7 @@ import SentEmail from './Screens/sentEmail'
 import Dashboard from './Screens/Dashboard'
 import TimeSetter from './Screens/timeSetter'
 import ProfileUser from './Screens/ProfileUser'
+import AboutUs from './Screens/About'
 
 const Stack = createNativeStackNavigator();
 
@@ -16,6 +18,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
+      <Stack.Screen name="AboutUs" component={AboutUs} options={{ headerShown: false }} />
         <Stack.Screen name="Start" component={Start} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
         <Stack.Screen name="Signup" component={Signup} options={{ headerShown: false }} />
@@ -23,6 +26,7 @@ export default function App() {
         <Stack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />
         <Stack.Screen name="TimeSetter" component={TimeSetter} options={{ headerShown: false }} />
         <Stack.Screen name="ProfileUser" component={ProfileUser} options={{ headerShown: false }} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

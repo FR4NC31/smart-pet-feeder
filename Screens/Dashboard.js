@@ -62,13 +62,12 @@ export default function Dashboardpage({navigation}) {
       }
 
   return (
-    <View style={{backgroundColor: '#fff'}}>
+    <View style={{ backgroundColor: 'white'}}>
         <TouchableOpacity onPress={() => navigation.navigate('ProfileUser')}>
             <Image source={require('../assets/profile.png')} style={styles.profile} />
             </TouchableOpacity>
             <Text style={styles.username}>Welcome Back,</Text>
             <Text style={styles.usernamedb}>{username}</Text>
-        <FontAwesome name="bell-o" size={40} color="black" style={styles.notifIcon}/>
 
         <Image source={require('../assets/dash.png')} style={styles.dashimg} />
         <Text style={styles.title}>Choose Pet</Text>
@@ -98,7 +97,7 @@ export default function Dashboardpage({navigation}) {
             <TouchableOpacity onPress={() => navigation.navigate('Pet1')} style={styles.icon}>
                 <Ionicons name="home-outline" size={40} color="black"/>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('Pet1')} style={styles.icon}>
+            <TouchableOpacity onPress={() => navigation.navigate('AboutUs')} style={styles.icon}>
                 <Ionicons name="information-circle-outline" size={50} color="black" style={{marginTop: 1}}/>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleLogout} style={styles.icon}>
