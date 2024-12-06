@@ -28,7 +28,7 @@ const useAlarmTrigger = () => {
   // Function to trigger the notification
   const scheduleAlarmNotification = async (alarm) => {
     const now = new Date();
-    const alarmTime = new Date(`${now.toDateString()} ${alarm.time}`); // Combine today's date with the alarm time
+    const alarmTime = new Date(`${now.toDateString()} ${alarm.time}`);
 
     if (alarmTime < now) {
       alarmTime.setDate(alarmTime.getDate() + 1); // If alarm time has already passed, set for next day
