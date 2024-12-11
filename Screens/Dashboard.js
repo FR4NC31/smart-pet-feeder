@@ -64,9 +64,9 @@ export default function Dashboardpage({navigation}) {
   return (
     <View style={{ backgroundColor: 'white'}}>
         <TouchableOpacity onPress={() => navigation.navigate('ProfileUser')}>
-            <Image source={require('../assets/profile.png')} style={styles.profile} />
+            <Image source={require('../assets/user.png')} style={styles.profile} />
             </TouchableOpacity>
-            <Text style={styles.username}>Welcome Back,</Text>
+            <Text style={styles.username}>Welcome,</Text>
             <Text style={styles.usernamedb}>{username}</Text>
 
         <Image source={require('../assets/dash.png')} style={styles.dashimg} />
@@ -95,7 +95,7 @@ export default function Dashboardpage({navigation}) {
         </View>
         <View style={styles.navbar}>
             <TouchableOpacity onPress={() => navigation.navigate('Pet1')} style={styles.icon}>
-                <Ionicons name="home-outline" size={40} color="black"/>
+                <Ionicons name="home" size={40} color="black"/>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.navigate('AboutUs')} style={styles.icon}>
                 <Ionicons name="information-circle-outline" size={50} color="black" style={{marginTop: 1}}/>
@@ -178,19 +178,19 @@ const styles = StyleSheet.create({
     },
 
     username: {
-        fontSize: 15,
+        fontSize: 20,
         color: 'black',
         fontFamily: 'MontserratBold',
         position: 'absolute',
-        top: 60,
-        left: 70,
+        top: 65,
+        left: 80,
     },
     usernamedb: {
-        fontSize: 15,
+        fontSize: 18,
         color: 'black',
         fontFamily: 'MontserratBold',
         position: 'absolute',
-        top: 80,
-        left: 70,
+        top: 67,
+        left: 175,
     },
 })

@@ -41,10 +41,10 @@ export default function ProfileUser({ navigation }) {
   return (
     <View>
       <View style={styles.profile}>
-        <TouchableOpacity onPress={() => navigation.navigate('Dashboard')}>
-          <Feather name="chevron-left" size={60} color="black" style={styles.backIcon} />
+        <TouchableOpacity onPress={() => navigation.navigate('Dashboard')} style={styles.backIcon}>
+          <Feather name="chevron-left" size={60} color="black"  />
         </TouchableOpacity>
-        <Image source={require('../assets/profile.png')} style={styles.img} />
+        <Image source={require('../assets/user.png')} style={styles.img} />
         <Text style={styles.name}>{username || 'Loading...'}</Text>
       </View>
     </View>
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   },
   backIcon: {
     marginTop: -50,
-    marginLeft: -200,
+    marginLeft: -340,
   },
   img: {
     width: 150,

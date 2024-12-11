@@ -143,12 +143,15 @@ export default function TimeSetter({ navigation }) {
   }, [userId]);
 
   const handleSave = async () => {
-    if (!hour || !minute || !selectedPeriod) {
+    if (!hour || !minute) {
       alert('Please ensure all fields are filled correctly.');
       return;
     }
 
-    const formattedTime = `${hour}:${minute} ${selectedPeriod}`;
+    const formattedHour = hour.padStart(2, '0'); // Add leading zero if needed
+    const formattedMinute = minute.padStart(2, '0'); // Add leading zero if needed
+    const formattedTime = `${formattedHour}:${formattedMinute}`;
+
     const newAlarm = { time: formattedTime, isEnabled: true };
 
     try {
@@ -163,12 +166,15 @@ export default function TimeSetter({ navigation }) {
     }
   };
   const handleEditSave = async () => {
-    if (!hour || !minute || !selectedPeriod) {
+    if (!hour || !minute) {
       alert('Please ensure all fields are filled correctly.');
       return;
     }
 
-    const formattedTime = `${hour}:${minute} ${selectedPeriod}`;
+    const formattedHour = hour.padStart(2, '0'); // Add leading zero if needed
+    const formattedMinute = minute.padStart(2, '0'); // Add leading zero if needed
+    const formattedTime = `${formattedHour}:${formattedMinute}`;
+
     const updatedAlarm = {
       time: formattedTime,
       isEnabled: times[editingIndex].isEnabled,
@@ -177,7 +183,7 @@ export default function TimeSetter({ navigation }) {
     try {
       const alarmRef = ref(db, `alarms/${userId}/${times[editingIndex].id}`);
       await update(alarmRef, updatedAlarm); // Update alarm in the database
-      await scheduleNotification(formattedTime); // Reschedule push notifica
+      await scheduleNotification(formattedTime); // Reschedule push notification
       closeEditModal();
     } catch (error) {
       console.error('Error updating alarm:', error.message);
@@ -226,12 +232,11 @@ export default function TimeSetter({ navigation }) {
   const resetFields = () => {
     setHour('');
     setMinute('');
-    setSelectedPeriod('AM');
     setEditingIndex(null);
   };
 
   const handleHourChange = (text) => {
-    if (/^([1-9]|1[0-2])?$/.test(text)) {
+    if (/^([0-1]?[0-9]|2[0-3])$/.test(text)) {
       setHour(text);
     }
   };
@@ -330,29 +335,6 @@ export default function TimeSetter({ navigation }) {
                 keyboardType="numeric"
                 maxLength={2}
               />
-              <View style={styles.amPm}>
-                <TouchableOpacity onPress={() => setSelectedPeriod('AM')}>
-                  <Text
-                    style={[
-                      styles.amPmText,
-                      selectedPeriod === 'AM' && styles.selected,
-                    ]}
-                  >
-                    AM
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setSelectedPeriod('PM')}>
-                  <Text
-                    style={[
-                      styles.amPmText,
-                      selectedPeriod === 'PM' && styles.selected,
-                    ]}
-                  >
-                    PM
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
             <View style={styles.actionButtons}>
               <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
                 <Text style={styles.saveText}>Save</Text>
@@ -366,6 +348,7 @@ export default function TimeSetter({ navigation }) {
             </View>
           </View>
         </View>
+      </View>
       </Modal>
 
       <Modal
@@ -396,29 +379,7 @@ export default function TimeSetter({ navigation }) {
           maxLength={2}
           required
         />
-        <View style={styles.amPm}>
-          <TouchableOpacity onPress={() => setSelectedPeriod('AM')}>
-            <Text
-              style={[
-                styles.amPmText,
-                selectedPeriod === 'AM' && styles.selected,
-              ]}
-            >
-              AM
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setSelectedPeriod('PM')}>
-            <Text
-              style={[
-                styles.amPmText,
-                selectedPeriod === 'PM' && styles.selected,
-              ]}
-            >
-              PM
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+
       <View style={styles.actionButtons}>
         <TouchableOpacity
           onPress={handleEditSave}
@@ -435,6 +396,7 @@ export default function TimeSetter({ navigation }) {
       </View>
     </View>
   </View>
+</View>
 </Modal>;
 
       {/* Bottom Navbar */}
@@ -505,6 +467,7 @@ const styles = StyleSheet.create({
     height: 300,
     borderRadius: 15,
     padding: 20,
+
   },
   timeTitle: {
     fontFamily: 'MontserratBold',
@@ -516,6 +479,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 35,
+    left: 70,
   },
   hourInput: {
     width: 90,
@@ -524,6 +488,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     textAlign: 'center',
     fontSize: 24,
+    marginLeft: 10,
   },
   minuteInput: {
     width: 90,
@@ -537,18 +502,6 @@ const styles = StyleSheet.create({
   colon: {
     fontSize: 30,
     marginLeft: 10,
-  },
-  amPm: {
-    marginLeft: 20,
-  },
-  amPmText: {
-    width: 59,
-    height: 25,
-    textAlign: 'center',
-    paddingTop: 2,
-    borderWidth: 1,
-    borderRadius: 25,
-    marginTop: 5,
   },
   selected: {
     backgroundColor: '#3498db',
@@ -585,7 +538,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 20,
-    backgroundColor: 'white',
+    top: 50,
+    left: -85,
   },
   saveButton: {
     backgroundColor: '#6C87F6',
@@ -594,7 +548,7 @@ const styles = StyleSheet.create({
     width: 74,
     height: 33,
     alignItems: 'center',
-    left: 240,
+    right: 100,
     top: 50,
   },
   cancelButton: {
@@ -617,22 +571,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-
-  actionText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginLeft: -110,
-    marginTop: 130,
-  },
-
-  actionText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginLeft: -110,
-    marginTop: 130,
   },
   deleteButton: {
     backgroundColor: '#D9534F',

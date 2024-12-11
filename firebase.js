@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth, initializeAuth, getReactNativePersistence } from "firebase/auth";
+import { getAuth, initializeAuth, getReactNativePersistence, GoogleAuthProvider } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getFirestore } from "firebase/firestore";
 import { getDatabase } from "firebase/database";
@@ -16,6 +16,8 @@ const firebaseConfig = {
   appId: "1:410766952418:web:374a978e64f1ce11f15bbb",
   measurementId: "G-YGBW4YB6YD",
 };
+
+
 
 const saveAlarmToFirebase = async (formattedTime) => {
     const db = getDatabase();
@@ -47,9 +49,7 @@ const saveAlarmToFirebase = async (formattedTime) => {
   };
 
 // Initialize Firebase app only if no apps are already initialized
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-
-// Initialize Firebase Auth (with a check to prevent re-initialization)
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();// Initialize Firebase Auth (with a check to prevent re-initialization)
 const auth = getAuth(app); // Use getAuth if already initialized
 if (!auth.app) {
   initializeAuth(app, {

@@ -19,10 +19,17 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.fr4nc.smartpetfeeder"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "1d09a03f-f2a0-4897-967c-902262a281c1"
+      }
+    },
+    "owner": "fr4nc"
   }
 }
