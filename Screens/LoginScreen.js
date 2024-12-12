@@ -14,11 +14,10 @@ export default function Loginpage({ navigation }) {
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(true);
 
-    // Google sign-in setup
     const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
-        clientId: '410766952418-jt8bee0qn0quqir3meeqgbpgdduh9kji.apps.googleusercontent.com',  // Replace with your actual client ID
-        scopes: ["email", "profile"],       // You can add other scopes as needed
-        redirectUri: makeRedirectUri({ useProxy: true }),  // Ensure proper redirect URI
+        clientId: '410766952418-jt8bee0qn0quqir3meeqgbpgdduh9kji.apps.googleusercontent.com',
+        scopes: ["email", "profile"],
+        redirectUri: makeRedirectUri({ useProxy: true }),
     });
 
     useEffect(() => {
@@ -38,7 +37,6 @@ export default function Loginpage({ navigation }) {
         }
     }, [response]);
 
-    // Email/password login handler
     const handleLogin = () => {
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
@@ -158,8 +156,8 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         marginHorizontal: 55,
         marginBottom: 20,
-        paddingLeft: 60,  // Add left padding for the icons
-        paddingRight: 40,  // Add right padding for the eye icon
+        paddingLeft: 60,
+        paddingRight: 40,
         paddingTop: 12,
         fontFamily: 'PoppinsRegular',
         fontSize: 22,
@@ -253,7 +251,7 @@ const styles = StyleSheet.create({
     eyeIconContainer: {
         position: 'absolute',
         right: 65,
-        top: 12, // Align eye icon with text input
+        top: 12,
     },
     eyeIcon: {
         opacity: 0.5,

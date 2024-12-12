@@ -5,73 +5,73 @@ import { useFonts } from 'expo-font';
 
 export default function About({ navigation }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedMember, setSelectedMember] = useState(null);  // Added state for selected member
+  const [selectedMember, setSelectedMember] = useState(null);
 
-  // Updated members array with description and custom images for modal only
+
   const members = [
     {
       id: '1',
       name: 'Giniel Reciles',
       position: 'Leader',
       role: 'Project Manager',
-      description: 'Leads the team and ensures smooth project execution.',
-      image: require('../assets/GinielJun.png'),  // Custom image path for modal
+      description: 'I oversee the development and deployment of mobile applications connected to IoT devices. My role involves managing end-to-end projects, coordinating cross-functional teams, and ensuring the successful integration of hardware, software, and connectivity solutions.',
+      image: require('../assets/GinielJun.png'),
     },
     {
       id: '2',
       name: 'Kenneth Pelicano',
       position: 'Member',
       role: 'UI/UX Designer',
-      description: 'Designs the user interface and experience of the app.',
-      image: require('../assets/Kenneth.png'),  // Custom image path for modal
+      description: 'As the UI/UX Designer for our mobile app Smart Pet Feeder, I am responsible for creating an intuitive, visually engaging, and seamless user experience that enhances pet care. My role involves designing user interfaces that are both functional and aesthetically pleasing, ensuring the app is easy to navigate for pet owners.',
+      image: require('../assets/Kenneth.png'),
     },
     {
       id: '3',
       name: 'Rachelle Pantinople',
       position: 'Member',
       role: 'Front-End Developer',
-      description: 'Develops the front-end part of the application.',
-      image: require('../assets/Rachelle.png'),  // Custom image path for modal
+      description: 'As the front-end developer for the "Smart Pet Feeder" app, my role involves crafting an intuitive and visually appealing interface that enhances the overall user experience. I design and implement interactive features, and seamless interactions to ensure a smooth and enjoyable experience for pet owners. My goal is to translate the app`s functionalities into an engaging and user-friendly interface, making it easy for users to monitor and manage their pet`s feeding schedule from their devices.',
+      image: require('../assets/Rachelle.png'),
     },
     {
       id: '4',
       name: 'Francis Ibañez',
       position: 'Member',
       role: 'Back-End Developer',
-      description: 'Develops the back-end part of the application.',
-      image: require('../assets/FrancisEdgard.png'),  // Custom image path for modal
+      description: 'As a backend developer for the Smart Pet Feeder Mobile Application, I designed and maintained server-side logic, managed databases for storing pet and feeding schedules, and implemented APIs to seamlessly connect the app with the feeder hardware. I ensured system reliability, optimized performance, and supported real-time communication for user commands and device responses.',
+      image: require('../assets/FrancisEdgard.png'),
     },
     {
       id: '5',
       name: 'Ryan Bedes',
       position: 'Member',
       role: 'Release Manager',
-      description: 'Develops the back-end part of the application.',
-      image: require('../assets/Ryan.png'),  // Custom image path for modal
+      description: 'As the Release Manager for the Smart Pet Feeder Mobile system, I am responsible for overseeing the planning, coordination, and deployment of all updates, features, and releases. I ensure that each release is delivered on schedule and meets quality standards without disruptions. My role involves managing timelines, collaborating with development and QA teams, addressing issues promptly, and maintaining clear communication with stakeholders. I also ensure the system’s performance, usability, and reliability align with user expectations, delivering an optimized experience for pet owners.',
+      image: require('../assets/Ryan.png'),
     },
     {
       id: '6',
       name: 'Dylan Ricalde',
       position: 'Member',
       role: 'Database Administrator',
-      description: 'Develops the back-end part of the application.',
-      image: require('../assets/Dylan.jpg'),  // Custom image path for modal
+      description: 'As a Database Administrator (DBA) on our project, my responsibility is to manage and monitor the application database to assure their security, efficiency, and stability. I am in charge of developing, implementing, and maintaining the database structure, ensuring that data is stored in a form that enables the application`s operation. This involves maintaining data backups, enhancing database performance, and resolving issues with data integrity or access. In addition, I communicate greatly with the development team to ensure that the database satisfies the project`s goals and needs while maintaining to acceptable operations for security and scalability. My role is critical to ensuring a smooth flow of data that supports the entire app.',
+      image: require('../assets/Dylan.jpg'),
     },
     {
       id: '7',
       name: 'Genny Arriesgado',
       position: 'Member',
       role: 'Assurance Specialist for Quality and Security',
-      description: 'Develops the back-end part of the application.',
-      image: require('../assets/Genny.png'),  // Custom image path for modal
+      description: 'As an Assurance Specialist for Quality & Security overseeing the "Smart Pet Feeder" application, my job is to ensure the app works well and is safe for users. I check that it feeds pets reliably and is easy to use. I also make sure that user data is protected from unauthorized access. By testing the app and working with my teams, I help ensure that the final product is safe, efficient, and enjoyable for pet owners and their furry friends.',
+      image: require('../assets/Genny.png'),
     },
     {
       id: '8',
       name: 'Mianne Seno',
       position: 'Member',
       role: 'User Insights Specialist',
-      description: 'Develops the back-end part of the application.',
-      image: require('../assets/Mianne.png'),  // Custom image path for modal
+      description: 'As a User Insight Analyst for the Smart Pet Feeder app, I enhanced the user experience by incorporating features such as pet type selection, a customizable feeding schedule, and engaging visuals. These improvements ensured the app was tailored, functional, and appealing to pet owners.',
+      image: require('../assets/Mianne.png'),
     },
   ];
 
@@ -84,15 +84,14 @@ export default function About({ navigation }) {
     return null;
   }
 
-  // Function to open modal with the selected member
   const openModal = (member) => {
-    setSelectedMember(member);  // Set selected member when clicked
-    setIsModalVisible(true);  // Show the modal
+    setSelectedMember(member);
+    setIsModalVisible(true);
   };
 
   // Function to close modal
   const closeModal = () => {
-    setIsModalVisible(false);  // Hide the modal
+    setIsModalVisible(false);
   };
 
   return (
@@ -109,12 +108,11 @@ export default function About({ navigation }) {
         <View style={styles.grid}>
           {members.map((member) => (
             <View key={member.id} style={styles.memberBox}>
-              {/* Default image in the ScrollView */}
               <Image source={require('../assets/user.png')} style={styles.memberImage} />
               <Text style={styles.memberName}>{member.name}</Text>
               <Text style={styles.memberPos}>{member.position}</Text>
               <TouchableOpacity
-                onPress={() => openModal(member)}  // Open modal with member data
+                onPress={() => openModal(member)}
                 style={styles.memberButton}
               >
                 <Text style={styles.memberOrder}>{member.role}</Text>
@@ -128,10 +126,8 @@ export default function About({ navigation }) {
         <Modal visible={isModalVisible} animationType="slide" transparent={true}>
           <View style={styles.modalContainer}>
             <View style={[styles.modalContent, styles[`modalContent_${selectedMember.role.replace(/\s+/g, '')}`]]}>
-              {/* Custom image in the modal */}
               <Image source={selectedMember.image} style={styles.modalImage} />
 
-              {/* Make sure all text components are wrapped properly */}
               <Text style={styles.modalName}>{selectedMember.name ? selectedMember.name : 'Name Missing'}</Text>
               <Text style={styles.modalRole}>{selectedMember.role ? selectedMember.role : 'Role Missing'}</Text>
               <Text style={styles.modalDescription}>{selectedMember.description ? selectedMember.description : 'Description Missing'}</Text>

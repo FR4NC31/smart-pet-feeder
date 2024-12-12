@@ -19,7 +19,7 @@ import {
   update,
   remove,
 } from 'firebase/database';
-import { getAuth } from 'firebase/auth'; // Firebase Authentication
+import { getAuth } from 'firebase/auth'
 import * as Notifications from 'expo-notifications';
 import * as TaskManager from 'expo-task-manager';
 import * as BackgroundFetch from 'expo-background-fetch';
@@ -29,8 +29,8 @@ import useAlarmTrigger from '../useAlarmTrigger';
 TaskManager.defineTask('ALARM_TRIGGER_TASK', async () => {
     try {
       const { checkAndTriggerAlarms } = useAlarmTrigger();
-      await checkAndTriggerAlarms(); // Trigger alarm check
-      return BackgroundFetch.Result.NewData; // Fetch new data
+      await checkAndTriggerAlarms();
+      return BackgroundFetch.Result.NewData;
     } catch (error) {
       console.error('Error in alarm trigger task:', error);
       return BackgroundFetch.Result.Failed;
@@ -49,14 +49,13 @@ export default function TimeSetter({ navigation }) {
   const [editingIndex, setEditingIndex] = useState(null);
   const [selectedPeriod, setSelectedPeriod] = useState('AM');
 
-  // Firebase database and auth reference
   const db = getDatabase();
   const auth = getAuth();
-  const userId = auth.currentUser?.uid; // Get the current user's ID
+  const userId = auth.currentUser?.uid
 
   const fetchAlarmsFromFirebase = async () => {
     const db = getDatabase();
-    const userId = "user123"; // Replace with actual user ID
+    const userId = "user123"
 
     onValue(ref(db, `alarms/${userId}`), (snapshot) => {
       const alarms = snapshot.val();
@@ -76,9 +75,9 @@ export default function TimeSetter({ navigation }) {
     const registerBackgroundFetch = async () => {
       try {
         await BackgroundFetch.registerTaskAsync('ALARM_TRIGGER_TASK', {
-          minimumInterval: 60 * 15, // Check alarms every 15 minutes
-          stopOnTerminate: false, // Keep running when the app is terminated
-          startOnBoot: true, // Start the task after a device reboot
+          minimumInterval: 60 * 15,
+          stopOnTerminate: false,
+          startOnBoot: true,
         });
       } catch (error) {
         console.error('Error registering background task:', error);
@@ -94,10 +93,10 @@ export default function TimeSetter({ navigation }) {
         content: {
           title: "Alarm Triggered",
           body: "Your alarm is ringing!",
-          sound: true, // Enable sound
+          sound: true,
         },
         trigger: {
-          seconds: 10, // Schedule it 10 seconds from now
+          seconds: 10,
         },
       });
       console.log("Notification scheduled successfully!");
@@ -118,16 +117,14 @@ export default function TimeSetter({ navigation }) {
 
   useEffect(() => {
     requestNotificationPermissions();
-    fetchAlarmsFromFirebase(); // Start fetching alarms
+    fetchAlarmsFromFirebase();
   }, []);
 
-  // Fetch alarms from the database on component mount
   useEffect(() => {
-    if (!userId) return; // Ensure user is logged in
+    if (!userId) return;
     })
-  // Fetch alarms from the database on component mount
   useEffect(() => {
-    if (!userId) return; // Ensure user is logged in
+    if (!userId) return;
 
 
     const alarmsRef = ref(db, `alarms/${userId}`);
@@ -139,7 +136,7 @@ export default function TimeSetter({ navigation }) {
       setTimes(alarmsList);
     });
 
-    return () => unsubscribe(); // Clean up the listener
+    return () => unsubscribe();
   }, [userId]);
 
   const handleSave = async () => {
@@ -148,17 +145,17 @@ export default function TimeSetter({ navigation }) {
       return;
     }
 
-    const formattedHour = hour.padStart(2, '0'); // Add leading zero if needed
-    const formattedMinute = minute.padStart(2, '0'); // Add leading zero if needed
+    const formattedHour = hour.padStart(2, '0');
+    const formattedMinute = minute.padStart(2, '0');
     const formattedTime = `${formattedHour}:${formattedMinute}`;
 
     const newAlarm = { time: formattedTime, isEnabled: true };
 
     try {
       const alarmsRef = ref(db, `alarms/${userId}`);
-      await push(alarmsRef, newAlarm); // Add new alarm to the database
+      await push(alarmsRef, newAlarm);
 
-      await scheduleNotification(formattedTime); // Schedule push notificati
+      await scheduleNotification(formattedTime);
       closeModal();
     } catch (error) {
       console.error('Error saving alarm:', error.message);
@@ -171,8 +168,8 @@ export default function TimeSetter({ navigation }) {
       return;
     }
 
-    const formattedHour = hour.padStart(2, '0'); // Add leading zero if needed
-    const formattedMinute = minute.padStart(2, '0'); // Add leading zero if needed
+    const formattedHour = hour.padStart(2, '0');
+    const formattedMinute = minute.padStart(2, '0');
     const formattedTime = `${formattedHour}:${formattedMinute}`;
 
     const updatedAlarm = {
@@ -182,8 +179,8 @@ export default function TimeSetter({ navigation }) {
 
     try {
       const alarmRef = ref(db, `alarms/${userId}/${times[editingIndex].id}`);
-      await update(alarmRef, updatedAlarm); // Update alarm in the database
-      await scheduleNotification(formattedTime); // Reschedule push notification
+      await update(alarmRef, updatedAlarm);
+      await scheduleNotification(formattedTime);
       closeEditModal();
     } catch (error) {
       console.error('Error updating alarm:', error.message);
@@ -194,8 +191,8 @@ export default function TimeSetter({ navigation }) {
   const deleteAlarm = async (index) => {
     try {
       const alarmRef = ref(db, `alarms/${userId}/${times[index].id}`);
-      await remove(alarmRef); // Remove alarm from the database
-      setExpandedIndex(null); // Close expanded view if deleted
+      setExpandedIndex(null);
+      await remove(alarmRef);
     } catch (error) {
       console.error('Error deleting alarm:', error.message);
       alert('Failed to delete the alarm. Please try again.');
@@ -208,7 +205,7 @@ export default function TimeSetter({ navigation }) {
 
     try {
       const alarmRef = ref(db, `alarms/${userId}/${alarm.id}`);
-      await update(alarmRef, updatedAlarm); // Update isEnabled state in the database
+      await update(alarmRef, updatedAlarm);
     } catch (error) {
       console.error('Error toggling alarm:', error.message);
       alert('Failed to toggle the alarm. Please try again.');
@@ -312,7 +309,6 @@ export default function TimeSetter({ navigation }) {
         )}
       </ScrollView>
 
-      {/* Add Alarm Modal */}
       <Modal visible={isModalVisible} animationType="slide" transparent={true}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>

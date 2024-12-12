@@ -26,12 +26,10 @@ export default function SentEmailpage({ navigation }) {
 
     sendPasswordResetEmail(auth, email)
       .then(() => {
-        // Successfully sent reset email
         Alert.alert("Success", "Password reset email has been sent!");
-        navigation.navigate('Login'); // Navigate back to login page
+        navigation.navigate('Login');
       })
       .catch((error) => {
-        // Handle errors (e.g., invalid email)
         console.error("Error sending reset email: ", error.message);
         Alert.alert("Error", "Failed to send reset email. Please check the email address.");
       });

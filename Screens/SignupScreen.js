@@ -3,8 +3,8 @@ import { useFonts } from 'expo-font';
 import { Feather } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, rtdb } from "../firebase";  // Import Firebase configuration
-import { ref, set } from "firebase/database";  // Import Realtime Database functions
+import { auth, rtdb } from "../firebase";
+import { ref, set } from "firebase/database";
 
 export default function Signuppage({ navigation }) {
     const [username, setUsername] = useState("");
@@ -13,7 +13,7 @@ export default function Signuppage({ navigation }) {
     const [confirmPassword, setConfirmPassword] = useState("");
 
     const isFormValid = () =>
-        username.length >= 3 && // Username must be at least 3 characters long
+        username.length >= 3 &&
         email.includes("@") &&
         password === confirmPassword &&
         password.length >= 8;
@@ -28,17 +28,13 @@ export default function Signuppage({ navigation }) {
         }
 
         try {
-            // Create user with email and password
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-            // Check if user is authenticated
             const userId = userCredential.user.uid;
-            console.log("Authenticated User ID:", userId);  // Log the user ID to ensure the user is logged in
+            console.log("Authenticated User ID:", userId);
 
-            // Reference to the user's data in Realtime Database
             const userRef = ref(rtdb, 'users/' + userId);
 
-            // Store the user data
             await set(userRef, {
                 username: username,
                 email: email,

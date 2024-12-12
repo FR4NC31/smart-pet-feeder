@@ -1,35 +1,23 @@
 {
   "expo": {
-    "name": "smart-pet-feeder",
-    "slug": "smart-pet-feeder",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.fr4nc.smartpetfeeder"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
     "extra": {
       "eas": {
-        "projectId": "1d09a03f-f2a0-4897-967c-902262a281c1"
+        "projectId": "0eecd40a-1533-4b58-9d42-4f1b01d209ad"
       }
     },
-    "owner": "fr4nc"
+    "updates": {
+      "url": "https://u.expo.dev/0eecd40a-1533-4b58-9d42-4f1b01d209ad"
+    },
+    "android": {
+      "runtimeVersion": "1.0.0",
+      "adaptiveIcon":{
+        "foregroundImage": "./assets/icon (2).png"
+      }
+    },
+    "ios": {
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
+    }
   }
 }
